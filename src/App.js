@@ -9,7 +9,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<TodoList/>}/>
+        <Route path="/todo-app-spring-react" element={<TodoList/>}/>
         <Route path="/view/:id" element={<TodoView/>}/>
         <Route path="/edit/:id" element={<TodoEdit/>}/>
       </Routes>
