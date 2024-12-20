@@ -31,7 +31,7 @@ const TodoList = () => {
 
     useEffect(() => {
         fetchTodos();
-    }, [page, pageSize]);
+    }, [page, pageSize, fetchTodos]);
 
     const fetchTodos = async () => {
         try {

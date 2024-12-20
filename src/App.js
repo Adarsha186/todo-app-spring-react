@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import TodoList from "./components/TodoList";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
