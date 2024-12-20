@@ -3,7 +3,7 @@
   "name": "todo-app",
   
   "version": "0.1.0",
-
+  
   "homepage": "https://adarsha186.github.io/todo-app-spring-react",
   
   "private": true,
@@ -122,6 +122,13 @@
   
     
   ]
+  
+  },
+  
+  "devDependencies": {
+  
+    
+  "gh-pages": "^6.2.0"
   
   }
 }
