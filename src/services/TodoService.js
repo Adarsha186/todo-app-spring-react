@@ -12,4 +12,6 @@ const updateTodo = (id, todo) => axios.put(`${API_URL}/${id}`, todo);
 
 const deleteTodo = (id) => axios.delete(`${API_URL}/${id}`);
 
-export { getTodoById, getTodos, createTodo, updateTodo, deleteTodo };
+const searchTodo = (query) => axios.get(`${API_URL}/search?q=${query}`);
+
+export { searchTodo, getTodoById, getTodos, createTodo, updateTodo, deleteTodo };

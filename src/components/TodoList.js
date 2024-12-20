@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getTodos, createTodo } from '../services/TodoService';
+import { searchTodo, getTodos, createTodo } from '../services/TodoService';
 import TodoItem from './TodoItem';
 import {
     Box,
@@ -21,6 +21,13 @@ const TodoList = () => {
         title: '',
         description: '',
     });
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleSearch = async () => {
+        const response = await searchTodo(searchTerm);
+        console.log(response);
+        setTodos(response.data);
+    }
 
     useEffect(() => {
         fetchTodos();
@@ -75,6 +82,18 @@ const TodoList = () => {
             <Typography variant="h4" gutterBottom>
                 Todo List
             </Typography>
+
+            <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
+                <TextField 
+                    label="Search"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    fullWidth
+                />
+                <Button onClick={handleSearch} color='primary' variant='contained'>
+                    Search
+                </Button>
+            </Box>
 
             {/* Add New Task Section */}
             <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
