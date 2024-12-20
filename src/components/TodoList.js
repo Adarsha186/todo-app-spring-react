@@ -1,110 +1,146 @@
 import React, { useState, useEffect } from 'react';
-import { getTodos, updateTodo, deleteTodo, createTodo } from '../services/TodoService';
-import { Link } from 'react-router-dom';
+import { getTodos, createTodo } from '../services/TodoService';
+import TodoItem from './TodoItem';
+import {
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Select,
+    MenuItem,
+    Pagination,
+    Grid,
+} from '@mui/material';
 
 const TodoList = () => {
     const [todos, setTodos] = useState([]);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
     const [newTodo, setNewTodo] = useState({
         title: '',
-        description: ''
+        description: '',
     });
 
     useEffect(() => {
         fetchTodos();
-    },[]);
+    }, [page, pageSize]);
 
     const fetchTodos = async () => {
-        const response = await getTodos();
-        console.log(response.data);
-        setTodos(response.data);
-    }
+        try {
+            const response = await getTodos(page, pageSize);
+            setTodos(response.data.content);
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error('Error fetching todos:', error);
+        }
+    };
 
-    const handleCheckBoxChange = async (todo) => {
-        const updatedTodo = {...todo, completed : !todo.completed}
-        await updateTodo(todo.id, updatedTodo);
-        fetchTodos();
-    }
+    const handlePageChange = (event, value) => {
+        setPage(value - 1);
+    };
 
-    const handleDelete = async (todo) => {
-        await deleteTodo(todo.id);
-        console.log("Deleted : ", todo);
-        fetchTodos();
-    }
+    const handlePageSizeChange = (event) => {
+        setPageSize(event.target.value);
+        setPage(0);
+    };
 
-    const handleInputChange = async (event) => {
+    const handleInputChange = (event) => {
         setNewTodo({
             ...newTodo,
-            [event.target.name] : event.target.value
-        })
-    }
+            [event.target.name]: event.target.value,
+        });
+    };
 
     const handleAddTodo = async () => {
-        if(!newTodo.title.trim()){
-            alert("Title cannot be empty");
+        if (!newTodo.title.trim()) {
+            alert('Title cannot be empty');
             return;
         }
-        try{
-            const response = await createTodo(newTodo);
+        try {
+            await createTodo(newTodo);
             fetchTodos();
             setNewTodo({
                 title: '',
-                description: ''
+                description: '',
             });
+        } catch (error) {
+            console.error('Error adding todo:', error);
         }
-        catch(error){
-            console.error(error);
-        }
-    }
+    };
 
     return (
-        <div>
-            <h2>Todo List</h2>
-            <ul>
+        <Box sx={{ padding: 4 }}>
+            {/* Header */}
+            <Typography variant="h4" gutterBottom>
+                Todo List
+            </Typography>
+
+            {/* Add New Task Section */}
+            <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
+                <TextField
+                    label="Task Title"
+                    name="title"
+                    value={newTodo.title}
+                    onChange={handleInputChange}
+                    fullWidth
+                />
+                <TextField
+                    label="Task Description"
+                    name="description"
+                    value={newTodo.description}
+                    onChange={handleInputChange}
+                    fullWidth
+                />
+                <Button variant="contained" color="primary" onClick={handleAddTodo}>
+                    Add Task
+                </Button>
+            </Box>
+
+            {/* Todo List */}
+            <Grid container spacing={2}>
                 {todos.map((todo) => (
-                    <>
-                        <li key={todo.id}> {todo.title} </li>
-                        <input
-                            type="checkbox"
-                            checked={todo.completed}
-                            onChange={() => handleCheckBoxChange(todo)}
-                            style={{ marginRight: "10px" }}
-                        />
-                        <Link to={`/view/${todo.id}`}>
-                            <button>Task Details</button>
-                        </Link>
-                        
-                        <Link to={`/edit/${todo.id}`}>
-                            <button>Edit</button>
-                        </Link>
-
-                        <button
-                            style={{ marginLeft: "10px" }}
-                                onClick={() => handleDelete(todo)}
-                        >
-                            Delete
-                        </button>
-                    </>
+                    <Grid item xs={12} key={todo.id}>
+                        <TodoItem todo={todo} refresh={fetchTodos} />
+                    </Grid>
                 ))}
-            </ul>
-            <h2>Add New Task</h2>
-            
-            <input 
-                type="text" 
-                placeholder="Task Title"
-                name="title"
-                value={newTodo.title}
-                onChange={handleInputChange}
-            />
-            <input 
-                type="text" 
-                placeholder="Task Description"
-                name="description"
-                value={newTodo.description}
-                onChange={handleInputChange} 
-            />
-            <button onClick={handleAddTodo}>Add Task</button>
-        </div>
-    )
-}
+            </Grid>
 
-export default TodoList
+            {/* Pagination and Page Size Controls */}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mt: 4,
+                }}
+            >
+                {/* Page Size Selector */}
+                <Box>
+                    <Typography variant="body1" component="label" htmlFor="pageSize">
+                        Page Size:
+                    </Typography>
+                    <Select
+                        id="pageSize"
+                        value={pageSize}
+                        onChange={handlePageSizeChange}
+                        sx={{ ml: 2 }}
+                    >
+                        <MenuItem value={5}>5</MenuItem>
+                        <MenuItem value={10}>10</MenuItem>
+                        <MenuItem value={20}>20</MenuItem>
+                    </Select>
+                </Box>
+
+                <Pagination
+                    count={totalPages}
+                    page={page + 1}
+                    onChange={handlePageChange}
+                    color="primary"
+                />
+            </Box>
+        </Box>
+    );
+};
+
+export default TodoList;
