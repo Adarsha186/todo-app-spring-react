@@ -1,4 +1,4 @@
-name: React Deployment
+name: Deploy React App to GitHub Pages
 
 on:
   push:
@@ -6,16 +6,31 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      # Step 1: Check out the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 14
-      - run: npm install
-      - run: npm run build
-      - uses: peaceiris/actions-gh-pages@v3
+          node-version: 16 # Update Node.js version as required
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: npm install
+
+      # Step 4: Build the React app
+      - name: Build the React App
+        run: npm run build
+
+      # Step 5: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
